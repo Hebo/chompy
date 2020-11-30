@@ -16,7 +16,7 @@ type Downloader struct {
 	downloadsDir string
 }
 
-// New creates a new downloader
+// New creates a new downloader that outputs to the given path
 func New(path string) Downloader {
 	dl := Downloader{downloadsDir: path}
 	log.Println("creating downloader for path ", path)

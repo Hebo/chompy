@@ -14,7 +14,11 @@ Deploy me via Docker, and call `/download` and `/videos`
 
 ## Development
 
-Run locally
+### Run locally
+
+**Dependencies:** [ffmpeg](https://ffmpeg.org/) and [youtube-dl](https://youtube-dl.org/)
+
+Run the app
 ```
 go run ./cmd/chompy
 ```
