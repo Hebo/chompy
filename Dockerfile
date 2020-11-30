@@ -39,5 +39,6 @@ WORKDIR /app
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /app/ /app/
 
+VOLUME [ "/downloads" ]
 EXPOSE 8000
-ENTRYPOINT ["/app/chompy", "-port", "8000"]
+ENTRYPOINT ["/app/chompy", "-port", "8000", "-downloads-dir", "/downloads"]

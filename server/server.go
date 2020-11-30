@@ -34,10 +34,6 @@ func New(downloadsDir string) Server {
 	}))
 	e.Use(middleware.Recover())
 
-	// if l, ok := e.Logger.(*log2.Logger); ok {
-	// 	l.SetHeader("${time_rfc3339} ${level}")
-	// }
-
 	// Routes
 	e.GET("/", hello)
 	e.GET("/videos", srv.getVideo)
