@@ -15,7 +15,6 @@ import (
 type Server struct {
 	router       *echo.Echo
 	downloadsDir string
-	baseURL      string
 	downloader   downloader.Downloader
 }
 

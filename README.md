@@ -1,5 +1,7 @@
 # Chompy
 
+![Build](https://github.com/hebo/chompy/workflows/gobuild/badge.svg)
+
 **Download and watch videos easily on iOS**
 
 Chompy wraps [youtube-dl](https://youtube-dl.org/) in an API, allowing ad-free downloading and streaming on devices that can't run youtube-dl directly, such as iOS.
