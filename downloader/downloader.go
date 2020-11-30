@@ -69,7 +69,6 @@ func (d Downloader) Download(url string) (string, error) {
 }
 
 var pathPatterns = []*regexp.Regexp{
-	// [download] downloads/'99 Percent' Miss This. What Is The Length.mp4 has already been downloaded and merged
 	regexp.MustCompile(`^\[download\][\s](.*?)[\s]has already.+$`),
 	regexp.MustCompile(`^\[ffmpeg\] Merging formats into "(.*?)"$`),
 }
