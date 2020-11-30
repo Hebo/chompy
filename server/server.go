@@ -35,7 +35,7 @@ func New(downloadsDir string) Server {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", hello)
+	e.GET("/", index)
 	e.GET("/videos", srv.getVideo)
 	e.POST("/download", srv.downloadVideo)
 
@@ -49,16 +49,8 @@ func (s Server) Serve(port int) {
 	s.router.Logger.Fatal(s.router.Start(portString))
 }
 
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
-}
-
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
+func index(c echo.Context) error {
+	return c.String(http.StatusOK, "Chompy is ready to eat!")
 }
 
 type downloadRequest struct {
@@ -106,4 +98,12 @@ func (s *Server) getVideo(c echo.Context) error {
 
 	http.ServeFile(c.Response().Writer, c.Request(), path)
 	return nil
+}
+
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }

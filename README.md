@@ -16,7 +16,7 @@ Deploy me via Docker, and call `/download` and `/videos`
 
 ### Run locally
 
-**Dependencies:** [ffmpeg](https://ffmpeg.org/) and [youtube-dl](https://youtube-dl.org/)
+**Dependencies:** [ffmpeg](https://ffmpeg.org/) and [youtube-dl](https://youtube-dl.org/). API examples use [HTTPie](https://httpie.io/)
 
 Run the app
 ```
@@ -26,7 +26,6 @@ go run ./cmd/chompy
 Download something exciting
 
 ```
-# download
 http -v post localhost:8000/download url="https://www.youtube.com/watch?v=L5emxkKNf9Y"
 ```
 
@@ -47,7 +46,7 @@ http -v localhost:8000/videos filename=='How to Protect Your Shopping Trolley Fr
 ```
 
 
-Run with docker
+### Docker
 
 ```
 docker build -t chompy .

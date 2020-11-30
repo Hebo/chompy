@@ -23,8 +23,9 @@ func New(path string) Downloader {
 	return dl
 }
 
-// Download fetches a single URL with youtube-dl, assuming youtube-dl is
-// in $PATH
+// Download fetches a single URL with youtube-dl and returns
+// the full path to the output file. We also require that youtube-dl is
+// in $PATH.
 func (d Downloader) Download(url string) (string, error) {
 	cmd := exec.Command("youtube-dl", url)
 	opts := defaultOptions()
@@ -49,23 +50,23 @@ func (d Downloader) Download(url string) (string, error) {
 		return "", errors.Wrap(err, "error starting cmd")
 	}
 
-	var filePath string
-	foundFilePath := false
+	var outFile string
+	foundFile := false
 	for p := range pathChan {
-		foundFilePath = true
-		filePath = p
+		foundFile = true
+		outFile = p
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		return "", errors.Wrap(err, "error waiting on cmd")
+		return "", errors.Wrap(err, "error runing cmd, check logs")
 	}
 
-	if !foundFilePath {
-		return "", errors.New("no output file path found")
+	if !foundFile {
+		return "", errors.New("unable to locate output file")
 	}
 
-	return filePath, nil
+	return outFile, nil
 }
 
 var pathPatterns = []*regexp.Regexp{
@@ -73,8 +74,9 @@ var pathPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`^\[ffmpeg\] Merging formats into "(.*?)"$`),
 }
 
-// capturingLogger prints and scans for the output filepath. The most recent
-// path found is assumed correct.
+// capturingLogger prints and scans for the output file. The most recent
+// path found is assumed to be the final output (particularly in cases where youtube-dl
+// merges video+audio files).
 func capturingLogger(s bufio.Scanner, out chan<- string) {
 	for s.Scan() {
 		log.Println("youtube-dl ->", s.Text())
@@ -86,18 +88,16 @@ func capturingLogger(s bufio.Scanner, out chan<- string) {
 	close(out)
 }
 
-// matchLogPath looks for file paths in log lines by matching against regex
+// matchLogPath looks for file paths in log lines by matching against regex patterns.
+// It returns the filename and whether any match was found.
 func matchLogPath(logLine string) (string, bool) {
-	var path string
-	found := false
 	// log.Println("matching line", logLine)
 	for _, r := range pathPatterns {
 		if matches := r.FindStringSubmatch(logLine); matches != nil {
 			log.Println("Matched path, ", matches[1])
-			path = matches[1]
-			found = true
+			return matches[1], true
 		}
 	}
 
-	return path, found
+	return "", false
 }
