@@ -22,6 +22,6 @@ jobs:
         run: go test -v .
 
       - name: Staticcheck
-      run: |
-        go get -u honnef.co/go/tools/cmd/staticcheck
-        staticcheck ./...
+        run: |
+          go get -u honnef.co/go/tools/cmd/staticcheck
+          staticcheck ./...
