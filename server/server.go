@@ -2,13 +2,12 @@ package server
 
 import (
 	"net/http"
-	"os"
 	"path"
 	"strconv"
 
 	"github.com/hebo/chompy/downloader"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 // Server handles RSS and other HTTP routes
@@ -17,6 +16,8 @@ type Server struct {
 	downloadsDir string
 	downloader   downloader.Downloader
 }
+
+const videosIndexPath = "/videos"
 
 // New creates a new Server
 func New(downloadsDir string) Server {
@@ -36,8 +37,10 @@ func New(downloadsDir string) Server {
 
 	// Routes
 	e.GET("/", index)
-	e.GET("/videos", srv.getVideo)
 	e.POST("/download", srv.downloadVideo)
+
+	fs := http.FileServer(http.Dir(downloadsDir))
+	e.GET(videosIndexPath+"/*", echo.WrapHandler(http.StripPrefix(videosIndexPath, fs)))
 
 	srv.router = e
 	return srv
@@ -59,6 +62,7 @@ type downloadRequest struct {
 
 type downloadResponse struct {
 	Filename string `json:"filename"`
+	Path     string `json:"path"`
 }
 
 func (s *Server) downloadVideo(c echo.Context) error {
@@ -80,30 +84,8 @@ func (s *Server) downloadVideo(c echo.Context) error {
 	_, filename := path.Split(filePath)
 	res := downloadResponse{
 		Filename: filename,
+		Path:     path.Join(videosIndexPath, filename),
 	}
 
 	return c.JSON(http.StatusOK, res)
-}
-
-func (s *Server) getVideo(c echo.Context) error {
-	filename := c.QueryParam("filename")
-	if filename == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "missing filename")
-	}
-
-	path := path.Join(s.downloadsDir, filename)
-	if !fileExists(path) {
-		return echo.NewHTTPError(http.StatusNotFound, "no file found")
-	}
-
-	http.ServeFile(c.Response().Writer, c.Request(), path)
-	return nil
-}
-
-func fileExists(path string) bool {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
 }
