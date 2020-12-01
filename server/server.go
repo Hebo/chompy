@@ -41,6 +41,9 @@ func New(downloadsDir string) Server {
 
 	fs := http.FileServer(http.Dir(downloadsDir))
 	e.GET(videosIndexPath+"/*", echo.WrapHandler(http.StripPrefix(videosIndexPath, fs)))
+	e.GET(videosIndexPath, func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, videosIndexPath+"/")
+	})
 
 	srv.router = e
 	return srv
