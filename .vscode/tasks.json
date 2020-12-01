@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "cwd": "${workspaceFolder}",
+  "tasks": [
+    {
+      "label": "test",
+      "command": "go",
+      "problemMatcher": "$go",
+      "args": [
+        "test",
+        "-v",
+        "./..."
+      ],
+      "group": "test",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "type": "shell",
+    },
+    {
+      "label": "vet",
+      "command": "go",
+      "problemMatcher": "$go",
+      "args": [
+        "vet",
+        "./..."
+      ],
+      "group": "test",
+      "type": "shell",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "dependsOn":["test"]
+    },
+    {
+      "label": "staticcheck",
+      "command": "staticcheck",
+      "args": [
+        "./...",
+      ],
+      "problemMatcher": "$go",
+      "group": "test",
+      "type": "shell",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "dependsOn":["vet"]
+    },
+    {
+      "label": "all",
+      "group": "test",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "dependsOn":["staticcheck"]
+    },
+  ],
+}
