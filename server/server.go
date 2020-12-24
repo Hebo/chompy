@@ -1,16 +1,22 @@
 package server
 
 import (
+	"html/template"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"path"
+	"sort"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/hebo/chompy/downloader"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-// Server handles RSS and other HTTP routes
+// Server handles HTTP routes
 type Server struct {
 	router       *echo.Echo
 	downloadsDir string
@@ -19,6 +25,14 @@ type Server struct {
 
 const videosIndexPath = "/videos"
 
+type tmpl struct {
+	templates *template.Template
+}
+
+func (t *tmpl) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
 // New creates a new Server
 func New(downloadsDir string) Server {
 	srv := Server{
@@ -26,8 +40,13 @@ func New(downloadsDir string) Server {
 		downloader:   downloader.New(downloadsDir),
 	}
 
+	t := &tmpl{
+		templates: template.Must(template.ParseGlob("public/views/*.html")),
+	}
+
 	// Echo instance
 	e := echo.New()
+	e.Renderer = t
 
 	// Middleware
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -36,10 +55,13 @@ func New(downloadsDir string) Server {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", index)
+	e.Static("/assets", "public/assets")
+
+	e.GET("/", srv.index)
+	e.GET(videosIndexPath+"/", srv.videosList)
 	e.POST("/download", srv.downloadVideo)
 
-	fs := http.FileServer(http.Dir(downloadsDir))
+	fs := http.FileServer(http.Dir(srv.downloadsDir))
 	e.GET(videosIndexPath+"/*", echo.WrapHandler(http.StripPrefix(videosIndexPath, fs)))
 	e.GET(videosIndexPath, func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, videosIndexPath+"/")
@@ -55,8 +77,31 @@ func (s Server) Serve(port int) {
 	s.router.Logger.Fatal(s.router.Start(portString))
 }
 
-func index(c echo.Context) error {
+func (s *Server) index(c echo.Context) error {
 	return c.String(http.StatusOK, "Chompy is ready to eat!")
+}
+
+type videoFile struct {
+	Filename string
+	Created  time.Time
+}
+
+func (s *Server) videosList(c echo.Context) error {
+	files, err := ioutil.ReadDir(s.downloadsDir)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	var vids []videoFile
+	for _, file := range files {
+		if strings.HasPrefix(file.Name(), ".") {
+			continue
+		}
+		vids = append(vids, videoFile{Filename: file.Name(), Created: file.ModTime()})
+	}
+
+	sort.Slice(vids, func(i, j int) bool { return vids[i].Created.After(vids[j].Created) })
+	return c.Render(http.StatusOK, "videos_list.html", vids)
 }
 
 type downloadRequest struct {
@@ -72,7 +117,6 @@ func (s *Server) downloadVideo(c echo.Context) error {
 	req := new(downloadRequest)
 	if err := c.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
-
 	}
 
 	if req.URL == "" {

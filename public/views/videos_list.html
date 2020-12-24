@@ -1,0 +1,43 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/sakura-dark.css" type="text/css">
+
+  <style>
+    body {
+      min-width: 70%;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Chompy Videos</h2>
+  <hr />
+
+  {{if .}}
+  <p>{{len .}} Videos Found</p>
+  <ul>
+    {{range .}}
+    <li>
+      <span>
+        <a href="{{.Filename}}">{{.Filename}}</a>
+      </span>
+      <span>{{.Created.Format "Jan _2 15:04:05"}}</span>
+    </li>
+    {{end}}
+  </ul>
+  {{else}}
+  <p>No videos</p>
+  {{end}}
+
+</body>
+
+</html>
