@@ -105,7 +105,8 @@ func (s *Server) videosList(c echo.Context) error {
 }
 
 type downloadRequest struct {
-	URL string `json:"url" form:"url"`
+	URL    string `json:"url" form:"url"`
+	Format string `json:"format" form:"format"`
 }
 
 type downloadResponse struct {
@@ -123,7 +124,7 @@ func (s *Server) downloadVideo(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "missing url")
 	}
 
-	filePath, err := s.downloader.Download(req.URL)
+	filePath, err := s.downloader.Download(req.URL, req.Format)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

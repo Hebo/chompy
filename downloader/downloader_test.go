@@ -14,7 +14,9 @@ func Test_matchLogPath(t *testing.T) {
 		{"merge1", "[ffmpeg] Merging formats into \"downloads/Dumbbell Romanian deadlift.mp4\"",
 			"downloads/Dumbbell Romanian deadlift.mp4", true},
 		{"download2", "[download] Destination: downloads/Dumbbell Romanian deadlift.f135.mp4",
-			"", false},
+			"downloads/Dumbbell Romanian deadlift.f135.mp4", true},
+		{"download3", "[download] Destination: downloads/How to Protect Your Shopping Trolley From Improvised Explosives.webm",
+			"downloads/How to Protect Your Shopping Trolley From Improvised Explosives.webm", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

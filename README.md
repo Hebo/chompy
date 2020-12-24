@@ -12,6 +12,16 @@ Better docs to come soon(TM)
 
 Deploy me via Docker, and call `/download` and `/videos`
 
+### Video Formats
+
+The default format for downloaded videos is mp4, at resolutions up to 1080p. You can see the exact format string in [downloader/options.go](downloader/options.go).
+
+Set the format for a download with the `format` request parameter. For instance:
+
+```
+http -v post localhost:8000/download url="https://www.youtube.com/watch?v=L5emxkKNf9Y" format='worstvideo'
+```
+
 ## Development
 
 ### Run locally
@@ -44,6 +54,8 @@ Then play it
 ```
 http -v localhost:8000/videos filename=='How to Protect Your Shopping Trolley From Improvised Explosives.mp4'
 ```
+
+
 
 
 ### Docker

@@ -26,11 +26,17 @@ func New(path string) Downloader {
 // Download fetches a single URL with youtube-dl and returns
 // the full path to the output file. We also require that youtube-dl is
 // in $PATH.
-func (d Downloader) Download(url string) (string, error) {
-	cmd := exec.Command("youtube-dl", url)
+func (d Downloader) Download(url, format string) (string, error) {
 	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
+	if format == "" {
+		opts = append(opts, defaultFormat)
+	} else {
+		log.Println("Using user-specified format: ", format)
+		opts = append(opts, stringOption{"--format", format})
+	}
 
+	cmd := exec.Command("youtube-dl", url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
 
 	log.Println("Running cmd", cmd.String())
@@ -69,9 +75,11 @@ func (d Downloader) Download(url string) (string, error) {
 	return outFile, nil
 }
 
+// pathPatterns contains patterns used to extract filenames from youtube-dl's output
 var pathPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`^\[download\][\s](.*?)[\s]has already.+$`),
 	regexp.MustCompile(`^\[ffmpeg\] Merging formats into "(.*?)"$`),
+	regexp.MustCompile(`^\[download\] Destination:\W(.*?)$`),
 }
 
 // capturingLogger prints and scans for the output file. The most recent

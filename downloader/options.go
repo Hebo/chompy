@@ -2,11 +2,11 @@ package downloader
 
 import "fmt"
 
-// defaultQuality = "bestvideo[height<=?1080]+bestaudio/best"
+// defaultFormat = "bestvideo[height<=?1080]+bestaudio/best"
 // Goals: <=1080p, reasonable size, avoid merging if possible
 // Below works decently well, but merges a lot?
 // https://www.reddit.com/r/youtubedl/comments/fe08jx/can_youtubedl_download_only_mp4_files_at_1080_or/
-const defaultQuality = "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"
+var defaultFormat = stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}
 
 type ytdlopts []option
 
@@ -42,7 +42,6 @@ func (o ytdlopts) ToCmdArgs() []string {
 func defaultOptions() ytdlopts {
 	return ytdlopts{
 		stringOption{"--retries", "3"},
-		stringOption{"--format", defaultQuality},
 		boolOption{"--no-progress"},
 	}
 }
