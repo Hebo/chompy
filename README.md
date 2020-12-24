@@ -10,9 +10,13 @@ Chompy wraps [youtube-dl](https://youtube-dl.org/) in an API, allowing ad-free d
 
 ## Usage
 
-Better docs to come soon(TM)
+1. Build & Install via Docker. Sorry, we don't have images published on DockerHub yet.
+2. Install the associated [shortcut](https://routinehub.co/shortcut/7875/) and set your hostname.
+3. Trigger a download by sharing a video URL to the shortcut. You can exit while the shortcut is downloading, but you won't be automatically redirected when the download completes.
 
-Deploy me via Docker, and call `/download` and `/videos`
+### Show all downloads
+
+You can see all the videos downloaded by visiting `/videos`
 
 ### Video Formats
 
@@ -37,24 +41,30 @@ go run ./cmd/chompy
 
 Download something exciting
 
-```
+```bash
 http -v post localhost:8000/download url="https://www.youtube.com/watch?v=L5emxkKNf9Y"
 ```
 
-```
+```bash
 HTTP/1.1 200 OK
-Content-Length: 83
+Content-Length: 168
 Content-Type: application/json; charset=UTF-8
-Date: Mon, 30 Nov 2020 19:27:53 GMT
+Date: Thu, 24 Dec 2020 23:40:11 GMT
 
 {
-    "filename": "How to Protect Your Shopping Trolley From Improvised Explosives.mp4"
+    "filename": "How to Protect Your Shopping Trolley From Improvised Explosives.mp4",
+    "path": "/videos/How to Protect Your Shopping Trolley From Improvised Explosives.mp4"
 }
 ```
 
 Then play it
-```
-http -v localhost:8000/videos filename=='How to Protect Your Shopping Trolley From Improvised Explosives.mp4'
+
+```bash
+http 'localhost:8000/videos/How to Protect Your Shopping Trolley From Improvised Explosives.mp4'
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 34311123
+Content-Type: video/mp4
 ```
 
 
