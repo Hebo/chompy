@@ -25,14 +25,6 @@ type Server struct {
 
 const videosIndexPath = "/videos"
 
-type tmpl struct {
-	templates *template.Template
-}
-
-func (t *tmpl) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
-}
-
 // New creates a new Server
 func New(downloadsDir string) Server {
 	srv := Server{
@@ -69,6 +61,14 @@ func New(downloadsDir string) Server {
 
 	srv.router = e
 	return srv
+}
+
+type tmpl struct {
+	templates *template.Template
+}
+
+func (t *tmpl) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 // Serve starts the HTTP server

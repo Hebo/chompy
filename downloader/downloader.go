@@ -65,7 +65,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 
 	err = cmd.Wait()
 	if err != nil {
-		return "", errors.Wrap(err, "error runing cmd, check logs")
+		return "", errors.Wrap(err, "error running cmd, check logs")
 	}
 
 	if !foundFile {

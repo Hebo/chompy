@@ -11,6 +11,7 @@ Chompy wraps [youtube-dl](https://youtube-dl.org/) in an API, allowing ad-free d
 ## Usage
 
 1. Build & Install via Docker. Sorry, we don't have images published on DockerHub yet.
+    * You'll want to set the `/downloads` volume
 2. Install the associated [shortcut](https://routinehub.co/shortcut/7875/) and set your hostname.
 3. Trigger a download by sharing a video URL to the shortcut. You can exit while the shortcut is downloading, but you won't be automatically redirected when the download completes.
 
@@ -66,9 +67,6 @@ Accept-Ranges: bytes
 Content-Length: 34311123
 Content-Type: video/mp4
 ```
-
-
-
 
 ### Docker
 
