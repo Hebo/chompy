@@ -29,6 +29,15 @@ Set the format for a download by setting the `format` request parameter. Details
 http -v post localhost:8000/download url="https://www.youtube.com/watch?v=L5emxkKNf9Y" format='worstvideo'
 ```
 
+### Playlist Sync
+
+Chompy can automatically download videos from a Youtube playlist, including your "Watch Later" list. To enable this, set the `PLAYLIST_SYNC` environment variable.
+
+```bash
+docker run -e "PLAYLIST_SYNC=https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR"
+```
+
+
 ## Development
 
 ### Run locally

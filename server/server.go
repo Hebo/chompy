@@ -71,8 +71,12 @@ func (t *tmpl) Render(w io.Writer, name string, data interface{}, c echo.Context
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-// Serve starts the HTTP server
+// Serve starts the HTTP server and background tasks
 func (s Server) Serve(port int) {
+	if err := s.startWorkers(); err != nil {
+		s.router.Logger.Fatal("Failed to start tasks:", err)
+	}
+
 	portString := ":" + strconv.Itoa(port)
 	s.router.Logger.Fatal(s.router.Start(portString))
 }
