@@ -26,6 +26,8 @@ func (s Server) startWorkers() error {
 	// - remove capturinglogger and replace w/ normal logger
 	//
 
+	s.downloader.DownloadPlaylist("https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR")
+
 	scheduler := cron.New(cron.WithChain(
 		cron.SkipIfStillRunning(cron.DiscardLogger),
 	))

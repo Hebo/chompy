@@ -23,42 +23,44 @@ func New(path string) Downloader {
 	return dl
 }
 
-// DownloadPlaylist ???
+// DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
+// are only downloaded if they do not exist in the output folder.
 /// https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR
-func (d Downloader) DownloadPlaylist(url string) (string, error) {
+func (d Downloader) DownloadPlaylist(url string) error {
 	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
+	// TODO: offer a way to change formats here
 	opts = append(opts, defaultFormat)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, "archive.txt")})
 
 	cmd := exec.Command("youtube-dl", url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
-
 	log.Println("Running cmd", cmd.String())
 
 	cmd.Stderr = os.Stderr
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create pipe")
+		return errors.Wrap(err, "failed to create pipe")
 	}
-
-	scanner := bufio.NewScanner(cmdReader)
-	pathChan := make(chan string)
-	go capturingLogger(*scanner, pathChan)
 
 	err = cmd.Start()
 	if err != nil {
-		return "", errors.Wrap(err, "error starting cmd")
+		return errors.Wrap(err, "error starting cmd")
 	}
 
-	err = cmd.Wait()
-	if err != nil {
-		return "", errors.Wrap(err, "error running cmd, check logs")
+	scanner := bufio.NewScanner(cmdReader)
+	for scanner.Scan() {
+		log.Println("youtube-dl ->", scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return err
 	}
 
-	log.Println("done dling")
+	if err = cmd.Wait(); err != nil {
+		return errors.Wrap(err, "error running cmd, check logs")
+	}
 
-	return "", nil
+	return nil
 }
 
 // Download fetches a single URL with youtube-dl and returns
@@ -76,7 +78,6 @@ func (d Downloader) Download(url, format string) (string, error) {
 
 	cmd := exec.Command("youtube-dl", url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
-
 	log.Println("Running cmd", cmd.String())
 
 	cmd.Stderr = os.Stderr
