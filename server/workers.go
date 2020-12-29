@@ -25,19 +25,25 @@ func (s Server) startWorkers() error {
 	// - handle private playlists
 	// - remove capturinglogger and replace w/ normal logger
 	//
+	var playlistTask func() = func() {}
+	if true { // TODO
+		playlistTask = func() {
+			log.Println("Playlist task triggered")
+			s.downloader.DownloadPlaylist("https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR")
+		}
+	}
 
-	s.downloader.DownloadPlaylist("https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR")
+	// Startup tasks
+	playlistTask()
 
-	scheduler := cron.New(cron.WithChain(
-		cron.SkipIfStillRunning(cron.DiscardLogger),
-	))
+	scheduler := cron.New(
+		cron.WithChain(
+			cron.SkipIfStillRunning(cron.DiscardLogger),
+		))
 
-	_, err := scheduler.AddFunc("@every 31m", func() {
-		log.Printf("Scheduler triggered for ?\n")
-		s.downloader.DownloadPlaylist("https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR")
-	})
+	_, err := scheduler.AddFunc("@every 31m", playlistTask)
 	if err != nil {
-		return errors.Wrap(err, "failed to schedule job")
+		return errors.Wrap(err, "failed to schedule task")
 	}
 
 	scheduler.Start()
