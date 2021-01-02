@@ -82,5 +82,5 @@ Content-Type: video/mp4
 ```
 docker build -t chompy .
 
-docker run -p 8000:8000 chompy
+docker run -p 8000:8000 --env TZ=America/Los_Angeles chompy
 ```
