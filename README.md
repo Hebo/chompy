@@ -11,7 +11,20 @@ Chompy wraps [youtube-dl](https://youtube-dl.org/) in an API, allowing ad-free d
 ## Usage
 
 1. Build & Install via Docker. Sorry, we don't have images published on DockerHub yet.
-    * You'll want to set the `/downloads` volume
+
+
+**docker cli**
+
+```bash
+docker run -p 8000:8000 \
+  -e TZ=America/Los_Angeles \
+  -e FORMAT= `#optional` \
+  -e PLAYLIST_SYNC= `#optional` \
+  -v /path/to/downloads:/downloads \
+  --restart unless-stopped \
+  chompy
+```
+
 2. Install the associated [shortcut](https://routinehub.co/shortcut/7875/) and set your hostname.
 3. Trigger a download by sharing a video URL to the shortcut. You can exit while the shortcut is downloading, but you won't be automatically redirected when the download completes.
 
@@ -29,12 +42,14 @@ Set the format for a download by setting the `format` request parameter. Details
 http -v post localhost:8000/download url="https://www.youtube.com/watch?v=L5emxkKNf9Y" format='worstvideo'
 ```
 
+To change the default format for _all downloads_, set the `FORMAT` env variable
+
 ### Playlist Sync
 
 Chompy can automatically download videos from a Youtube playlist, including your "Watch Later" list. To enable this, set the `PLAYLIST_SYNC` environment variable.
 
 ```bash
-docker run -e "PLAYLIST_SYNC=https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR"
+docker run -e "PLAYLIST_SYNC=https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR" chompy
 ```
 
 

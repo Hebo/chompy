@@ -3,6 +3,7 @@ module github.com/hebo/chompy
 go 1.15
 
 require (
+	github.com/caarlos0/env/v6 v6.4.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kisielk/errcheck v1.4.0
 	github.com/labstack/echo/v4 v4.1.17
@@ -13,6 +14,6 @@ require (
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
 	golang.org/x/sys v0.0.0-20201130171929-760e229fe7c5 // indirect
 	golang.org/x/text v0.3.4 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	golang.org/x/tools v0.0.0-20210102185154-773b96fafca2 // indirect
 	honnef.co/go/tools v0.0.1-2020.1.6
 )

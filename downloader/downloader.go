@@ -14,23 +14,32 @@ import (
 // Downloader handles downloading of video urls, wrapping youtube-dl
 type Downloader struct {
 	downloadsDir string
+	format       stringOption
 }
 
 // New creates a new downloader that outputs to the given path
-func New(path string) Downloader {
-	dl := Downloader{downloadsDir: path}
+func New(path, format string) Downloader {
+	dl := Downloader{
+		downloadsDir: path,
+	}
+
 	log.Println("creating downloader for path ", path)
+	if format != "" {
+		log.Println("using specified youtube-dl format ", format)
+		dl.format = stringOption{"--format", format}
+	} else {
+		dl.format = defaultFormat
+	}
+
 	return dl
 }
 
 // DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
 // are only downloaded if they do not exist in the output folder.
-/// https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR
 func (d Downloader) DownloadPlaylist(url string) error {
 	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
-	// TODO: offer a way to change formats here
-	opts = append(opts, defaultFormat)
+	opts = append(opts, d.format)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, "archive.txt")})
 
 	cmd := exec.Command("youtube-dl", url)
@@ -70,7 +79,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
 	if format == "" {
-		opts = append(opts, defaultFormat)
+		opts = append(opts, d.format)
 	} else {
 		log.Println("Using user-specified format: ", format)
 		opts = append(opts, stringOption{"--format", format})
