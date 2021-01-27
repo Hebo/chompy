@@ -50,7 +50,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 	cookiesPath := path.Join(d.downloadsDir, ytdlCookiesFile)
 	if _, err := os.Stat(cookiesPath); err == nil {
 		opts = append(opts, stringOption{"--cookies", cookiesPath})
-	} else {
+	} else if !os.IsNotExist(err) {
 		return errors.Wrap(err, "failed to read cookie file")
 	}
 
