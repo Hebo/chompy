@@ -40,7 +40,7 @@ COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /app/ /app/
 
 VOLUME [ "/downloads" ]
-ENV DOWNLOAD_DIR="/downloads"
+ENV DOWNLOADS_DIR="/downloads"
 ENV PORT=8000
 EXPOSE 8000
 ENTRYPOINT ["/app/chompy"]
