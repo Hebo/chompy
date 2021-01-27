@@ -13,7 +13,9 @@ func (s Server) startWorkers() error {
 		log.Printf("Tracking playlist: %s\n", s.playlistSyncURL)
 		playlistTask = func() {
 			log.Println("Playlist task triggered")
-			s.downloader.DownloadPlaylist(s.playlistSyncURL)
+			if err := s.downloader.DownloadPlaylist(s.playlistSyncURL); err != nil {
+				log.Println("Error downloading playlist:", err)
+			}
 		}
 	}
 
