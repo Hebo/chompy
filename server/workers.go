@@ -7,27 +7,30 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-func (s Server) startWorkers() error {
-	var playlistTask func() = func() {}
-	if s.playlistSyncURL != "" {
-		log.Printf("Tracking playlist: %s\n", s.playlistSyncURL)
-		playlistTask = func() {
-			log.Println("Playlist task triggered")
-			if err := s.downloader.DownloadPlaylist(s.playlistSyncURL); err != nil {
-				log.Println("Error downloading playlist:", err)
-			}
-		}
+func (s Server) taskPlaylistSync() {
+	if s.playlistSyncURL == "" {
+		return
 	}
 
-	// Startup tasks
-	playlistTask()
+	log.Println("PlaylistSync task triggered")
+	if err := s.downloader.DownloadPlaylist(s.playlistSyncURL); err != nil {
+		log.Println("Error downloading playlist:", err)
+	}
+}
 
+func (s Server) startWorkers() error {
+
+	// Startup tasks
+	log.Printf("Tracking playlist: %s\n", s.playlistSyncURL)
+	s.taskPlaylistSync()
+
+	// Scheduled tasks
 	scheduler := cron.New(
 		cron.WithChain(
 			cron.SkipIfStillRunning(cron.DiscardLogger),
 		))
 
-	_, err := scheduler.AddFunc("@every 31m", playlistTask)
+	_, err := scheduler.AddFunc("@every 31m", s.taskPlaylistSync)
 	if err != nil {
 		return errors.Wrap(err, "failed to schedule task")
 	}
