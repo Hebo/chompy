@@ -8,23 +8,6 @@ import (
 )
 
 func (s Server) startWorkers() error {
-
-	// general design thoughts
-	//
-	// - explore how to handle config
-	// - do we need to create config folder? contains:
-	//        1. archive.txt
-	//        2. config options
-	//       needs research on best way to manage config and be easy to run
-	//  - set archive.txt to config folder?
-	//  - spin off workers for cleanup, regular playlist downloads
-	//   - for GC, perhaps a return a channel / fn to call from api fns after each download
-	//
-	// TODOs
-	// -x set playlist url via config
-	// - handle private playlists
-	// -x remove capturinglogger and replace w/ normal logger
-	//
 	var playlistTask func() = func() {}
 	if s.playlistSyncURL != "" {
 		log.Printf("Tracking playlist: %s\n", s.playlistSyncURL)
