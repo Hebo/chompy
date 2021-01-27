@@ -39,6 +39,8 @@ const (
 	ytdlCookiesFile = ".ytdl-cookies.txt"
 )
 
+func CheckCookies
+
 // DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
 // are only downloaded if they do not exist in the output folder.
 func (d Downloader) DownloadPlaylist(url string) error {
@@ -50,7 +52,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 	cookiesPath := path.Join(d.downloadsDir, ytdlCookiesFile)
 	if _, err := os.Stat(cookiesPath); err == nil {
 		opts = append(opts, stringOption{"--cookies", cookiesPath})
-	} else if !os.IsNotExist(err) {
+	} else {
 		return errors.Wrap(err, "failed to read cookie file")
 	}
 
