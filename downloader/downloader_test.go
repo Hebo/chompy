@@ -1,6 +1,8 @@
 package downloader
 
 import (
+	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,12 +38,24 @@ func Test_matchLogPath(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	downloader := New("path", "")
+	downloader := New("path", "", nil)
 	want := Downloader{downloadsDir: "path", format: stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}}
-	assert.Equal(t, downloader, want)
+	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
+	assert.Equal(t, downloader.format, want.format)
+	assert.NotNil(t, downloader.postFunc)
 
-	downloader = New("/downloads", "bestvideo")
+	downloader = New("/downloads", "bestvideo", nil)
 	want = Downloader{downloadsDir: "/downloads", format: stringOption{"--format", "bestvideo"}}
-	assert.Equal(t, downloader, want)
+	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
+	assert.Equal(t, downloader.format, want.format)
+	assert.NotNil(t, downloader.postFunc)
 
+	noop := func() {}
+	downloader = New("/downloads", "bestvideo", noop)
+	want = Downloader{downloadsDir: "/downloads", format: stringOption{"--format", "bestvideo"}}
+	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
+	assert.Equal(t, downloader.format, want.format)
+	funcName1 := runtime.FuncForPC(reflect.ValueOf(downloader.postFunc).Pointer()).Name()
+	funcName2 := runtime.FuncForPC(reflect.ValueOf(noop).Pointer()).Name()
+	assert.Equal(t, funcName1, funcName2)
 }
