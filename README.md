@@ -48,6 +48,8 @@ To change the default format for _all downloads_, set the `FORMAT` env variable
 
 Chompy can automatically download videos from a Youtube playlist, including your "Watch Later" list. To enable this, set the `PLAYLIST_SYNC` environment variable.
 
+To sync private playlists, you need to add your cookies in a file named `.ytdl-cookies.txt` to the downloads folder. See the [youtube-dl instructions](https://github.com/ytdl-org/youtube-dl/blob/master/README.md#how-do-i-pass-cookies-to-youtube-dl) for how to extract cookies into the correct format.
+
 ```bash
 docker run -e "PLAYLIST_SYNC=https://www.youtube.com/playlist?list=PLMM9FcCPG72z8fGbr-R4mLXebKcV45tkR" chompy
 ```

@@ -34,13 +34,23 @@ func New(path, format string) Downloader {
 	return dl
 }
 
+const (
+	ytdlArchiveFile = ".ytdl-archive.txt"
+	ytdlCookiesFile = ".ytdl-cookies.txt"
+)
+
 // DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
 // are only downloaded if they do not exist in the output folder.
 func (d Downloader) DownloadPlaylist(url string) error {
 	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
 	opts = append(opts, d.format)
-	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, "archive.txt")})
+	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
+
+	cookiesPath := path.Join(d.downloadsDir, ytdlCookiesFile)
+	if _, err := os.Stat(cookiesPath); err == nil {
+		opts = append(opts, stringOption{"--cookies", cookiesPath})
+	}
 
 	cmd := exec.Command("youtube-dl", url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
