@@ -101,7 +101,8 @@ func (s *Server) videosList(c echo.Context) error {
 
 	var vids []videoFile
 	for _, file := range files {
-		if strings.HasPrefix(file.Name(), ".") {
+		// Ignore youtube-dl's playlist tracking file
+		if strings.HasPrefix(file.Name(), ".") || file.Name() == "archive.txt" {
 			continue
 		}
 		vids = append(vids, videoFile{Filename: file.Name(), Created: file.ModTime()})
