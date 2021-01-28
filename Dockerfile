@@ -16,6 +16,7 @@ FROM alpine:3.12.1
 
 RUN set -x \
  && apk add --no-cache \
+        tzdata \
         curl \
         ffmpeg \
         gnupg \
@@ -36,6 +37,7 @@ RUN set -x \
 
 WORKDIR /app
 
+COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /app/ /app/
 
