@@ -21,8 +21,10 @@ func (s Server) taskPlaylistSync() {
 func (s Server) startWorkers() error {
 
 	// Startup tasks
-	log.Printf("Tracking playlist: %s\n", s.playlistSyncURL)
-	s.taskPlaylistSync()
+	if s.playlistSyncURL != "" {
+		log.Printf("Tracking playlist: %s\n", s.playlistSyncURL)
+		s.taskPlaylistSync()
+	}
 
 	// Scheduled tasks
 	scheduler := cron.New(
