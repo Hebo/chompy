@@ -43,5 +43,6 @@ func defaultOptions() ytdlopts {
 	return ytdlopts{
 		stringOption{"--retries", "3"},
 		boolOption{"--no-progress"},
+		boolOption{"--no-mtime"},
 	}
 }
