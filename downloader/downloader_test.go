@@ -1,6 +1,10 @@
 package downloader
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func Test_matchLogPath(t *testing.T) {
 	tests := []struct {
@@ -29,4 +33,15 @@ func Test_matchLogPath(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestNew(t *testing.T) {
+	downloader := New("path", "")
+	want := Downloader{downloadsDir: "path", format: stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}}
+	assert.Equal(t, downloader, want)
+
+	downloader = New("/downloads", "bestvideo")
+	want = Downloader{downloadsDir: "/downloads", format: stringOption{"--format", "bestvideo"}}
+	assert.Equal(t, downloader, want)
+
 }

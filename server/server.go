@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hebo/chompy/config"
 	"github.com/hebo/chompy/downloader"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -18,18 +19,20 @@ import (
 
 // Server handles HTTP routes
 type Server struct {
-	router       *echo.Echo
-	downloadsDir string
-	downloader   downloader.Downloader
+	router          *echo.Echo
+	downloadsDir    string
+	downloader      downloader.Downloader
+	playlistSyncURL string
 }
 
 const videosIndexPath = "/videos"
 
 // New creates a new Server
-func New(downloadsDir string) Server {
+func New(cfg config.Config) Server {
 	srv := Server{
-		downloadsDir: downloadsDir,
-		downloader:   downloader.New(downloadsDir),
+		downloadsDir:    cfg.DownloadsDir,
+		playlistSyncURL: cfg.PlaylistSyncURL,
+		downloader:      downloader.New(cfg.DownloadsDir, cfg.Format),
 	}
 
 	t := &tmpl{
@@ -71,8 +74,12 @@ func (t *tmpl) Render(w io.Writer, name string, data interface{}, c echo.Context
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-// Serve starts the HTTP server
+// Serve starts the HTTP server and background tasks
 func (s Server) Serve(port int) {
+	if err := s.startWorkers(); err != nil {
+		s.router.Logger.Fatal("Failed to start tasks:", err)
+	}
+
 	portString := ":" + strconv.Itoa(port)
 	s.router.Logger.Fatal(s.router.Start(portString))
 }

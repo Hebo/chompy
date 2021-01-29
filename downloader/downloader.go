@@ -14,13 +14,74 @@ import (
 // Downloader handles downloading of video urls, wrapping youtube-dl
 type Downloader struct {
 	downloadsDir string
+	format       stringOption
 }
 
 // New creates a new downloader that outputs to the given path
-func New(path string) Downloader {
-	dl := Downloader{downloadsDir: path}
+func New(path, format string) Downloader {
+	dl := Downloader{
+		downloadsDir: path,
+	}
+
 	log.Println("creating downloader for path ", path)
+	if format != "" {
+		log.Println("using specified youtube-dl format ", format)
+		dl.format = stringOption{"--format", format}
+	} else {
+		dl.format = defaultFormat
+	}
+
 	return dl
+}
+
+const (
+	ytdlArchiveFile = ".ytdl-archive.txt"
+	ytdlCookiesFile = ".ytdl-cookies.txt"
+)
+
+// DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
+// are only downloaded if they do not exist in the output folder.
+func (d Downloader) DownloadPlaylist(url string) error {
+	opts := defaultOptions()
+	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
+	opts = append(opts, d.format)
+	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
+
+	cookiesPath := path.Join(d.downloadsDir, ytdlCookiesFile)
+	if _, err := os.Stat(cookiesPath); err == nil {
+		opts = append(opts, stringOption{"--cookies", cookiesPath})
+	} else if !os.IsNotExist(err) {
+		return errors.Wrap(err, "failed to read cookie file")
+	}
+
+	cmd := exec.Command("youtube-dl", url)
+	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
+	log.Println("Running cmd", cmd.String())
+
+	cmd.Stderr = os.Stderr
+	cmdReader, err := cmd.StdoutPipe()
+	if err != nil {
+		return errors.Wrap(err, "failed to create pipe")
+	}
+
+	err = cmd.Start()
+	if err != nil {
+		return errors.Wrap(err, "error starting cmd")
+	}
+
+	scanner := bufio.NewScanner(cmdReader)
+	for scanner.Scan() {
+		log.Println("youtube-dl ->", scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	if err = cmd.Wait(); err != nil {
+		return errors.Wrap(err, "error running cmd, check logs")
+	}
+
+	return nil
 }
 
 // Download fetches a single URL with youtube-dl and returns
@@ -30,7 +91,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
 	if format == "" {
-		opts = append(opts, defaultFormat)
+		opts = append(opts, d.format)
 	} else {
 		log.Println("Using user-specified format: ", format)
 		opts = append(opts, stringOption{"--format", format})
@@ -38,7 +99,6 @@ func (d Downloader) Download(url, format string) (string, error) {
 
 	cmd := exec.Command("youtube-dl", url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
-
 	log.Println("Running cmd", cmd.String())
 
 	cmd.Stderr = os.Stderr
