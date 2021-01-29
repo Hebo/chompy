@@ -61,9 +61,8 @@ Chompy can delete videos (oldest first) to keep disk usage within a specified li
 
 ex.
 ```
--e PLAYLIST_SYNC=1024 # limit to 1 GiB
+-e SIZE_LIMIT=1024 # limit to 1 GiB
 ```
-
 
 Note that we can't predict the size of a downloaded video, so the disk usage may exceed your specified limit temporarily until cleanup is performed.
 
