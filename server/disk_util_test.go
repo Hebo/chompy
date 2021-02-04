@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_isOverSizeLimit(t *testing.T) {
+func TestNeedsDeletion(t *testing.T) {
 	testVideos := []videoFile{
 		{"2.mp4", time.Time{}, 5},
 		{"3.mp4", time.Time{}, 10},
@@ -19,8 +19,8 @@ func Test_isOverSizeLimit(t *testing.T) {
 	}
 
 	type args struct {
-		videos    []videoFile
-		sizeLimit int64
+		videos []videoFile
+		max    int64
 	}
 	tests := []struct {
 		name  string
@@ -35,12 +35,12 @@ func Test_isOverSizeLimit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := needsDeletion(tt.args.videos, tt.args.sizeLimit)
+			got, got1 := needsDeletion(tt.args.videos, tt.args.max)
 			if got != tt.want {
-				t.Errorf("isOverSizeLimit() got = %v, want %v", got, tt.want)
+				t.Errorf("NeedsDeletion() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("isOverSizeLimit() got1 = %v, want %v", got1, tt.want1)
+				t.Errorf("NeedsDeletion() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}

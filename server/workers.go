@@ -18,13 +18,13 @@ func (s Server) taskPlaylistSync() {
 	}
 }
 
-// taskLimitSize limits the disk size of downloaded videos by deleting
+// taskCleanup limits the disk size of downloaded videos by deleting
 // videos until the downloads directory size is within the specified size limit.
-// Videos are deleted in strict reverse chronological order (i.e. taskLimitSize
+// Videos are deleted in strict reverse chronological order (i.e. taskCleanup
 // will not attempt to delete larger videos before smaller ones).
-func (s Server) taskLimitSize() {
-	if s.sizeLimit != 0 {
-		log.Printf("Max downloads size set to %d MiB\n", s.sizeLimit)
+func (s Server) taskCleanup() {
+	if s.maxSize != 0 {
+		log.Printf("Max downloads dir size set to %d MiB\n", s.maxSize)
 	}
 
 	videos, err := getVideoFiles(s.downloadsDir, createdAsc)
@@ -32,19 +32,18 @@ func (s Server) taskLimitSize() {
 		log.Fatalln("Failed to get video files:", err)
 	}
 
-	if over, diff := needsDeletion(videos, int64(s.sizeLimit)); over {
-		log.Printf("/!\\ Size limit is lower than current directory size (by %d MiB). "+
+	if over, diff := needsDeletion(videos, int64(s.maxSize)); over {
+		log.Printf("/!\\ MAX_SIZE is lower than current directory size (by %d MiB). "+
 			"Please remove extra files manually", diff)
 
-		// TODO: uncomment - testing
-		// s.sizeLimit = 0
+		s.maxSize = 0
 	}
 
 	for {
 		if _, ok := <-s.cleanup; ok {
-			log.Println("taskLimitSize task triggered")
+			log.Println("taskMaxSize task triggered")
 
-			if s.sizeLimit == 0 {
+			if s.maxSize == 0 {
 				continue
 			}
 
@@ -54,7 +53,7 @@ func (s Server) taskLimitSize() {
 				continue
 			}
 
-			over, diff := needsDeletion(vids, int64(s.sizeLimit))
+			over, diff := needsDeletion(vids, int64(s.maxSize))
 			if !over {
 				continue
 			}
@@ -70,7 +69,7 @@ func (s Server) taskLimitSize() {
 				vidsToDelete = append(vidsToDelete, v)
 			}
 
-			log.Printf("Over size limit by %d MiB. "+
+			log.Printf("Over max size by %d MiB. "+
 				"Deleting %d videos to free %d MiB", diff, len(vidsToDelete), reclaimed)
 
 			if err = deleteVideoFiles(s.fs, vidsToDelete, s.downloadsDir); err != nil {
@@ -103,7 +102,7 @@ func (s Server) startWorkers() error {
 		log.Printf("Tracking playlist: %s\n", s.playlistSyncURL)
 	}
 	go jobPlaylistSync.Run()
-	go s.taskLimitSize()
+	go s.taskCleanup()
 
 	scheduler.Start()
 	return nil

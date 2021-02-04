@@ -49,10 +49,10 @@ func getVideoFiles(path string, order ordering) ([]videoFile, error) {
 }
 
 // needsDeletion checks if the total size of videos is over the specified limit
-func needsDeletion(videos []videoFile, limit int64) (bool, int64) {
+func needsDeletion(videos []videoFile, max int64) (bool, int64) {
 	var size, diff int64
 
-	if limit == 0 {
+	if max == 0 {
 		return false, diff
 	}
 
@@ -60,7 +60,7 @@ func needsDeletion(videos []videoFile, limit int64) (bool, int64) {
 		size += v.Size
 	}
 
-	diff = size - limit
+	diff = size - max
 	if diff <= 0 {
 		return false, diff
 	}

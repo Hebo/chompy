@@ -22,7 +22,7 @@ type Server struct {
 	downloadsDir    string
 	downloader      downloader.Downloader
 	playlistSyncURL string
-	sizeLimit       int
+	maxSize         int
 	cleanup         chan (struct{})
 }
 
@@ -34,7 +34,7 @@ func New(cfg config.Config, fs afero.Fs) Server {
 		fs:              fs,
 		downloadsDir:    cfg.DownloadsDir,
 		playlistSyncURL: cfg.PlaylistSyncURL,
-		sizeLimit:       cfg.SizeLimit,
+		maxSize:         cfg.MaxSize,
 		cleanup:         make(chan struct{}),
 	}
 

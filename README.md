@@ -20,7 +20,7 @@ docker run -p 8000:8000 \
   -e TZ=America/Los_Angeles \
   -e FORMAT= `#optional` \
   -e PLAYLIST_SYNC= `#optional` \
-  -e SIZE_LIMIT= `#optional (in MiB)` \
+  -e MAX_SIZE= `#optional (in MiB)` \
   -v /path/to/downloads:/downloads \
   --restart unless-stopped \
   chompy
@@ -57,11 +57,11 @@ docker run -e "PLAYLIST_SYNC=https://www.youtube.com/playlist?list=PLMM9FcCPG72z
 
 ### Limit Disk Usage
 
-Chompy can delete videos (oldest first) to keep disk usage within a specified limit. Set the `SIZE_LIMIT` environment variable (in [MiB](https://en.wikipedia.org/wiki/Byte#Multiple-byte_units)) to enable. Video deletion occurs after every successful download.
+Chompy can delete videos (oldest first) to keep disk usage within a specified limit. Set the `MAX_SIZE` environment variable (in [MiB](https://en.wikipedia.org/wiki/Byte#Multiple-byte_units)) to enable. Video deletion occurs after every successful download.
 
 ex.
 ```
--e SIZE_LIMIT=1024 # limit to 1 GiB
+-e MAX_SIZE=1024 # limit to 1 GiB
 ```
 
 Note that we can't predict the size of a downloaded video, so the disk usage may exceed your specified limit temporarily until cleanup is performed.
