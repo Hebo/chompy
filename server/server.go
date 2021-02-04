@@ -3,37 +3,42 @@ package server
 import (
 	"html/template"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"path"
-	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/hebo/chompy/config"
 	"github.com/hebo/chompy/downloader"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/spf13/afero"
 )
 
 // Server handles HTTP routes
 type Server struct {
+	fs              afero.Fs
 	router          *echo.Echo
 	downloadsDir    string
 	downloader      downloader.Downloader
 	playlistSyncURL string
+	maxSize         int
+	cleanup         chan (struct{})
 }
 
 const videosIndexPath = "/videos"
 
 // New creates a new Server
-func New(cfg config.Config) Server {
+func New(cfg config.Config, fs afero.Fs) Server {
 	srv := Server{
+		fs:              fs,
 		downloadsDir:    cfg.DownloadsDir,
 		playlistSyncURL: cfg.PlaylistSyncURL,
-		downloader:      downloader.New(cfg.DownloadsDir, cfg.Format),
+		maxSize:         cfg.MaxSize,
+		cleanup:         make(chan struct{}),
 	}
+
+	srv.downloader = downloader.New(cfg.DownloadsDir, cfg.Format, srv.triggerCleanup)
 
 	t := &tmpl{
 		templates: template.Must(template.ParseGlob("public/views/*.html")),
@@ -56,8 +61,8 @@ func New(cfg config.Config) Server {
 	e.GET(videosIndexPath+"/", srv.videosList)
 	e.POST("/download", srv.downloadVideo)
 
-	fs := http.FileServer(http.Dir(srv.downloadsDir))
-	e.GET(videosIndexPath+"/*", echo.WrapHandler(http.StripPrefix(videosIndexPath, fs)))
+	fSrv := http.FileServer(http.Dir(srv.downloadsDir))
+	e.GET(videosIndexPath+"/*", echo.WrapHandler(http.StripPrefix(videosIndexPath, fSrv)))
 	e.GET(videosIndexPath, func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, videosIndexPath+"/")
 	})
@@ -91,23 +96,15 @@ func (s *Server) index(c echo.Context) error {
 type videoFile struct {
 	Filename string
 	Created  time.Time
+	Size     int64
 }
 
 func (s *Server) videosList(c echo.Context) error {
-	files, err := ioutil.ReadDir(s.downloadsDir)
+	vids, err := getVideoFiles(s.downloadsDir, createdDesc)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	var vids []videoFile
-	for _, file := range files {
-		if strings.HasPrefix(file.Name(), ".") {
-			continue
-		}
-		vids = append(vids, videoFile{Filename: file.Name(), Created: file.ModTime()})
-	}
-
-	sort.Slice(vids, func(i, j int) bool { return vids[i].Created.After(vids[j].Created) })
 	return c.Render(http.StatusOK, "videos_list.html", vids)
 }
 

@@ -15,12 +15,19 @@ import (
 type Downloader struct {
 	downloadsDir string
 	format       stringOption
+	postFunc     func()
 }
 
-// New creates a new downloader that outputs to the given path
-func New(path, format string) Downloader {
+// New creates a new downloader that outputs to the given path, invoking youtube-dl with format
+// If set, postFunc is called synchronously after successful downloads to allow for post-processing or cleanup.
+func New(path, format string, postFunc func()) Downloader {
 	dl := Downloader{
 		downloadsDir: path,
+		postFunc:     postFunc,
+	}
+
+	if postFunc == nil {
+		dl.postFunc = func() {}
 	}
 
 	log.Println("creating downloader for path ", path)
@@ -81,6 +88,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 		return errors.Wrap(err, "error running cmd, check logs")
 	}
 
+	d.postFunc()
 	return nil
 }
 
@@ -132,6 +140,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 		return "", errors.New("unable to locate output file")
 	}
 
+	d.postFunc()
 	return outFile, nil
 }
 
