@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 	"time"
@@ -40,8 +41,12 @@ func New(cfg config.Config, fs afero.Fs) Server {
 
 	srv.downloader = downloader.New(cfg.DownloadsDir, cfg.Format, srv.triggerCleanup)
 
+	funcMap := template.FuncMap{
+		"escape": url.PathEscape,
+	}
+
 	t := &tmpl{
-		templates: template.Must(template.ParseGlob("public/views/*.html")),
+		templates: template.Must(template.New("main").Funcs(funcMap).ParseGlob("public/views/*.html")),
 	}
 
 	// Echo instance
