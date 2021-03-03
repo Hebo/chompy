@@ -31,7 +31,7 @@
     {{range .}}
     <li>
       <span>
-        <a href="{{.Filename}}">{{.Filename}}</a>
+        <a href="{{escape .Filename}}">{{.Filename}}</a>
       </span>
       <span class="created">{{.Created.Format "Jan _2 15:04"}}</span>
     </li>
