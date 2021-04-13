@@ -53,6 +53,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
 	opts = append(opts, d.format)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
+	opts = append(opts, boolOption{"--mark-watched"})
 
 	cookiesPath := path.Join(d.downloadsDir, ytdlCookiesFile)
 	if _, err := os.Stat(cookiesPath); err == nil {
