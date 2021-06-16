@@ -95,7 +95,7 @@ func (s Server) Serve(port int) {
 }
 
 func (s *Server) index(c echo.Context) error {
-	return c.String(http.StatusOK, "Chompy is ready to eat!")
+	return c.Redirect(http.StatusTemporaryRedirect, "/videos")
 }
 
 type videoFile struct {
