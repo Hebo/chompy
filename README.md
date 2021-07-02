@@ -10,8 +10,9 @@ Chompy wraps [youtube-dl](https://youtube-dl.org/) in an API, allowing ad-free d
 
 ## Usage
 
-1. Build & Install via Docker. Sorry, we don't have images published on DockerHub yet.
+Docker images located at [`ghcr.io/hebo/chompy`](https://github.com/Hebo/chompy/pkgs/container/chompy)
 
+1. Run Docker image
 
 **docker cli**
 
@@ -23,7 +24,7 @@ docker run -p 8000:8000 \
   -e MAX_SIZE= `#optional (in MiB)` \
   -v /path/to/downloads:/downloads \
   --restart unless-stopped \
-  chompy
+  ghcr.io/hebo/chompy
 ```
 
 2. Install the associated [shortcut](https://routinehub.co/shortcut/7875/) and set your hostname.
