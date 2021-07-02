@@ -12,7 +12,7 @@ Chompy wraps [youtube-dl](https://youtube-dl.org/) in an API, allowing ad-free d
 
 Docker images located at [`ghcr.io/hebo/chompy`](https://github.com/Hebo/chompy/pkgs/container/chompy)
 
-1. Start service
+1. Run Docker image
 
 **docker cli**
 
