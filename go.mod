@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/caarlos0/env/v6 v6.4.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dustin/go-humanize v1.0.0
 	github.com/kisielk/errcheck v1.4.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.17

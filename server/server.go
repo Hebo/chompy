@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	"github.com/hebo/chompy/config"
 	"github.com/hebo/chompy/downloader"
 	"github.com/labstack/echo/v4"
@@ -42,7 +43,8 @@ func New(cfg config.Config, fs afero.Fs) Server {
 	srv.downloader = downloader.New(cfg.DownloadsDir, cfg.Format, srv.triggerCleanup)
 
 	funcMap := template.FuncMap{
-		"escape": url.PathEscape,
+		"escape":    url.PathEscape,
+		"humanTime": humanize.Time,
 	}
 
 	t := &tmpl{
