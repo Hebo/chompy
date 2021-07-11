@@ -44,13 +44,15 @@ func New(path, format string, postFunc func()) Downloader {
 const (
 	ytdlArchiveFile = ".ytdl-archive.txt"
 	ytdlCookiesFile = ".ytdl-cookies.txt"
+
+	ytdlOutputTemplate = "%(uploader)s - %(title)s.%(ext)s"
 )
 
 // DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
 // are only downloaded if they do not exist in the output folder.
 func (d Downloader) DownloadPlaylist(url string) error {
 	opts := defaultOptions()
-	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
+	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	opts = append(opts, d.format)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
 	opts = append(opts, boolOption{"--mark-watched"})
@@ -98,7 +100,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 // in $PATH.
 func (d Downloader) Download(url, format string) (string, error) {
 	opts := defaultOptions()
-	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, "%(title)s.%(ext)s")})
+	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	if format == "" {
 		opts = append(opts, d.format)
 	} else {
