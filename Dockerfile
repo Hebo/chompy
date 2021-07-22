@@ -29,6 +29,9 @@ RUN set -x \
    && gpg --keyserver keyserver.ubuntu.com --recv-keys 'ED7F5BF46B3BBED81C87368E2C393E0F18A9236D' \
    && gpg --verify youtube-dl.sig /usr/local/bin/youtube-dl \
    && chmod a+rx /usr/local/bin/youtube-dl \
+   # Install yt-dlp
+   && curl -sSLo /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+   && chmod a+rx /usr/local/bin/yt-dlp \
    # Requires python -> python3.
    && ln -s /usr/bin/python3 /usr/bin/python \
    # Clean-up

@@ -7,6 +7,7 @@ type Config struct {
 	DownloadsDir    string `env:"DOWNLOADS_DIR" envDefault:"./downloads"`
 	PlaylistSyncURL string `env:"PLAYLIST_SYNC"`
 	// youtube-dl format string
-	Format  string `env:"FORMAT"`
-	MaxSize int    `env:"MAX_SIZE" envDefault:"0"`
+	Format   string `env:"FORMAT"`
+	MaxSize  int    `env:"MAX_SIZE" envDefault:"0"`
+	UseYtdlp bool   `env:"USE_YTDLP" envDefault:"True"`
 }

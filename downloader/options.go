@@ -47,3 +47,15 @@ func defaultOptions() ytdlopts {
 		stringOption{"--match-filter", "!is_live"},
 	}
 }
+
+func defaultOptionsYtdlp() ytdlopts {
+	return ytdlopts{
+		stringOption{"--retries", "3"},
+		boolOption{"--no-progress"},
+		boolOption{"--no-mtime"},
+		stringOption{"--match-filter", "!is_live"},
+		// Compatibility
+		stringOption{"--compat-options", "multistreams"},
+		stringOption{"--compat-options", "abort-on-error"},
+	}
+}

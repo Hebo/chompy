@@ -40,7 +40,11 @@ func New(cfg config.Config, fs afero.Fs) Server {
 		cleanup:         make(chan struct{}),
 	}
 
-	srv.downloader = downloader.New(cfg.DownloadsDir, cfg.Format, srv.triggerCleanup)
+	tool := downloader.ToolYoutubeDLOriginal
+	if cfg.UseYtdlp {
+		tool = downloader.ToolYtdlpFork
+	}
+	srv.downloader = downloader.New(tool, cfg.DownloadsDir, cfg.Format, srv.triggerCleanup)
 
 	funcMap := template.FuncMap{
 		"escape":    url.PathEscape,

@@ -15,12 +15,31 @@ import (
 type Downloader struct {
 	downloadsDir string
 	format       stringOption
+	toolName     string
+	options      ytdlopts
 	postFunc     func()
+}
+
+type Tool int
+
+const (
+	ToolYoutubeDLOriginal Tool = iota
+	ToolYtdlpFork
+)
+
+// nameAndOptions returns a tool's executable name and associated options
+func (p Tool) nameAndOptions() (string, ytdlopts) {
+	switch p {
+	case ToolYtdlpFork:
+		return "yt-dlp", defaultOptionsYtdlp()
+	default:
+		return "youtube-dl", defaultOptions()
+	}
 }
 
 // New creates a new downloader that outputs to the given path, invoking youtube-dl with format
 // If set, postFunc is called synchronously after successful downloads to allow for post-processing or cleanup.
-func New(path, format string, postFunc func()) Downloader {
+func New(tool Tool, path, format string, postFunc func()) Downloader {
 	dl := Downloader{
 		downloadsDir: path,
 		postFunc:     postFunc,
@@ -30,13 +49,15 @@ func New(path, format string, postFunc func()) Downloader {
 		dl.postFunc = func() {}
 	}
 
-	log.Println("creating downloader for path ", path)
 	if format != "" {
 		log.Println("using specified youtube-dl format ", format)
 		dl.format = stringOption{"--format", format}
 	} else {
 		dl.format = defaultFormat
 	}
+
+	dl.toolName, dl.options = tool.nameAndOptions()
+	log.Printf("Created downloader for path %q with tool %q", path, dl.toolName)
 
 	return dl
 }
@@ -51,7 +72,7 @@ const (
 // DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
 // are only downloaded if they do not exist in the output folder.
 func (d Downloader) DownloadPlaylist(url string) error {
-	opts := defaultOptions()
+	opts := d.options
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	opts = append(opts, d.format)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
@@ -64,9 +85,9 @@ func (d Downloader) DownloadPlaylist(url string) error {
 		return errors.Wrap(err, "failed to read cookie file")
 	}
 
-	cmd := exec.Command("youtube-dl", url)
+	cmd := exec.Command(d.toolName, url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
-	log.Println("Running cmd", cmd.String())
+	log.Println("Running cmd:", cmd.String())
 
 	cmd.Stderr = os.Stderr
 	cmdReader, err := cmd.StdoutPipe()
@@ -81,7 +102,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 
 	scanner := bufio.NewScanner(cmdReader)
 	for scanner.Scan() {
-		log.Println("youtube-dl ->", scanner.Text())
+		log.Println("cmd ->", scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
 		return err
@@ -99,7 +120,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 // the full path to the output file. We also require that youtube-dl is
 // in $PATH.
 func (d Downloader) Download(url, format string) (string, error) {
-	opts := defaultOptions()
+	opts := d.options
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	if format == "" {
 		opts = append(opts, d.format)
@@ -108,9 +129,9 @@ func (d Downloader) Download(url, format string) (string, error) {
 		opts = append(opts, stringOption{"--format", format})
 	}
 
-	cmd := exec.Command("youtube-dl", url)
+	cmd := exec.Command(d.toolName, url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
-	log.Println("Running cmd", cmd.String())
+	log.Println("Running cmd:", cmd.String())
 
 	cmd.Stderr = os.Stderr
 	cmdReader, err := cmd.StdoutPipe()
@@ -150,7 +171,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 // pathPatterns contains patterns used to extract filenames from youtube-dl's output
 var pathPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`^\[download\][\s](.*?)[\s]has already.+$`),
-	regexp.MustCompile(`^\[ffmpeg\] Merging formats into "(.*?)"$`),
+	regexp.MustCompile(`^\[(?:ffmpeg|Merger)\] Merging formats into "(.*?)"$`),
 	regexp.MustCompile(`^\[download\] Destination:\W(.*?)$`),
 }
 
@@ -159,7 +180,7 @@ var pathPatterns = []*regexp.Regexp{
 // merges video+audio files).
 func capturingLogger(s bufio.Scanner, out chan<- string) {
 	for s.Scan() {
-		log.Println("youtube-dl ->", s.Text())
+		log.Println("cmd ->", s.Text())
 		if path, ok := matchLogPath(s.Text()); ok {
 			out <- path
 		}
