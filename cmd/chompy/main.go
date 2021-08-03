@@ -20,6 +20,7 @@ func main() {
 
 	go func() {
 		// Pprof
+		log.Println("Loading pprof on localhost:6060")
 		log.Println(http.ListenAndServe("localhost:6060", nil))
 	}()
 
