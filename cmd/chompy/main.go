@@ -20,8 +20,8 @@ func main() {
 
 	go func() {
 		// Pprof
-		log.Println("Loading pprof on localhost:6060")
-		log.Println(http.ListenAndServe("localhost:6060", nil))
+		log.Println("Loading pprof on :6060")
+		log.Println(http.ListenAndServe(":6060", nil))
 	}()
 
 	server := server.New(cfg, afero.NewOsFs())
