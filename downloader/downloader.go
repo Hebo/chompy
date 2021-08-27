@@ -15,31 +15,12 @@ import (
 type Downloader struct {
 	downloadsDir string
 	format       stringOption
-	toolName     string
-	options      ytdlopts
 	postFunc     func()
-}
-
-type Tool int
-
-const (
-	ToolYoutubeDLOriginal Tool = iota
-	ToolYtdlpFork
-)
-
-// nameAndOptions returns a tool's executable name and associated options
-func (p Tool) nameAndOptions() (string, ytdlopts) {
-	switch p {
-	case ToolYtdlpFork:
-		return "yt-dlp", defaultOptionsYtdlp()
-	default:
-		return "youtube-dl", defaultOptions()
-	}
 }
 
 // New creates a new downloader that outputs to the given path, invoking youtube-dl with format
 // If set, postFunc is called synchronously after successful downloads to allow for post-processing or cleanup.
-func New(tool Tool, path, format string, postFunc func()) Downloader {
+func New(path, format string, postFunc func()) Downloader {
 	dl := Downloader{
 		downloadsDir: path,
 		postFunc:     postFunc,
@@ -56,13 +37,14 @@ func New(tool Tool, path, format string, postFunc func()) Downloader {
 		dl.format = defaultFormat
 	}
 
-	dl.toolName, dl.options = tool.nameAndOptions()
-	log.Printf("Created downloader for path %q with tool %q", path, dl.toolName)
+	log.Printf("Created downloader for path %q", path)
 
 	return dl
 }
 
 const (
+	toolName = "yt-dtp"
+
 	ytdlArchiveFile = ".ytdl-archive.txt"
 	ytdlCookiesFile = ".ytdl-cookies.txt"
 
@@ -72,7 +54,7 @@ const (
 // DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
 // are only downloaded if they do not exist in the output folder.
 func (d Downloader) DownloadPlaylist(url string) error {
-	opts := d.options
+	opts := defaultOptionsYtdlp()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	opts = append(opts, d.format)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
@@ -85,7 +67,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 		return errors.Wrap(err, "failed to read cookie file")
 	}
 
-	cmd := exec.Command(d.toolName, url)
+	cmd := exec.Command(toolName, url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
 	log.Println("Running cmd:", cmd.String())
 
@@ -120,7 +102,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 // the full path to the output file. We also require that youtube-dl is
 // in $PATH.
 func (d Downloader) Download(url, format string) (string, error) {
-	opts := d.options
+	opts := defaultOptionsYtdlp()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	if format == "" {
 		opts = append(opts, d.format)
@@ -129,7 +111,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 		opts = append(opts, stringOption{"--format", format})
 	}
 
-	cmd := exec.Command(d.toolName, url)
+	cmd := exec.Command(toolName, url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
 	log.Println("Running cmd:", cmd.String())
 

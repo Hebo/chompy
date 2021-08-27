@@ -41,34 +41,22 @@ func Test_matchLogPath(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	downloader := New(ToolYoutubeDLOriginal, "path", "", nil)
+	downloader := New("path", "", nil)
 	want := Downloader{downloadsDir: "path",
-		toolName: "youtube-dl",
-		format:   stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}}
-	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
-	assert.Equal(t, downloader.toolName, want.toolName)
-	assert.Equal(t, downloader.format, want.format)
-	assert.NotNil(t, downloader.postFunc)
-
-	downloader = New(ToolYoutubeDLOriginal, "/downloads", "bestvideo", nil)
-	want = Downloader{downloadsDir: "/downloads",
-		toolName: "youtube-dl",
-		format:   stringOption{"--format", "bestvideo"}}
+		format: stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}}
 	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
 	assert.Equal(t, downloader.format, want.format)
 	assert.NotNil(t, downloader.postFunc)
 
-	downloader = New(ToolYtdlpFork, "/downloads", "bestvideo", nil)
+	downloader = New("/downloads", "bestvideo", nil)
 	want = Downloader{downloadsDir: "/downloads",
-		toolName: "yt-dlp",
-		format:   stringOption{"--format", "bestvideo"}}
-	assert.Equal(t, downloader.toolName, want.toolName)
+		format: stringOption{"--format", "bestvideo"}}
 	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
 	assert.Equal(t, downloader.format, want.format)
 	assert.NotNil(t, downloader.postFunc)
 
 	noop := func() {}
-	downloader = New(ToolYoutubeDLOriginal, "/downloads", "bestvideo", noop)
+	downloader = New("/downloads", "bestvideo", noop)
 	want = Downloader{downloadsDir: "/downloads", format: stringOption{"--format", "bestvideo"}}
 	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
 	assert.Equal(t, downloader.format, want.format)

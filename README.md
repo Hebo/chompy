@@ -71,7 +71,7 @@ Note that we can't predict the size of a downloaded video, so the disk usage may
 
 ### Run locally
 
-**Dependencies:** [ffmpeg](https://ffmpeg.org/) and [youtube-dl](https://youtube-dl.org/) or [yt-dlp](https://github.com/yt-dlp/yt-dlp). API examples use [HTTPie](https://httpie.io/)
+**Dependencies:** [ffmpeg](https://ffmpeg.org/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp). API examples use [HTTPie](https://httpie.io/)
 
 Run the app
 ```
