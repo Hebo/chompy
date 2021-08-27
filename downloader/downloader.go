@@ -54,7 +54,7 @@ const (
 // DownloadPlaylist downloads a playlist using the youtube-dl archive feature, so videos
 // are only downloaded if they do not exist in the output folder.
 func (d Downloader) DownloadPlaylist(url string) error {
-	opts := defaultOptionsYtdlp()
+	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	opts = append(opts, d.format)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
@@ -102,7 +102,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 // the full path to the output file. We also require that youtube-dl is
 // in $PATH.
 func (d Downloader) Download(url, format string) (string, error) {
-	opts := defaultOptionsYtdlp()
+	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	if format == "" {
 		opts = append(opts, d.format)
