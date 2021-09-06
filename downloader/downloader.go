@@ -30,7 +30,6 @@ func New(path, format string, postFunc func()) Downloader {
 		dl.postFunc = func() {}
 	}
 
-	log.Println("creating downloader for path ", path)
 	if format != "" {
 		log.Println("using specified youtube-dl format ", format)
 		dl.format = stringOption{"--format", format}
@@ -38,10 +37,14 @@ func New(path, format string, postFunc func()) Downloader {
 		dl.format = defaultFormat
 	}
 
+	log.Printf("Created downloader for path %q", path)
+
 	return dl
 }
 
 const (
+	toolName = "yt-dtp"
+
 	ytdlArchiveFile = ".ytdl-archive.txt"
 	ytdlCookiesFile = ".ytdl-cookies.txt"
 
@@ -64,9 +67,9 @@ func (d Downloader) DownloadPlaylist(url string) error {
 		return errors.Wrap(err, "failed to read cookie file")
 	}
 
-	cmd := exec.Command("youtube-dl", url)
+	cmd := exec.Command(toolName, url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
-	log.Println("Running cmd", cmd.String())
+	log.Println("Running cmd:", cmd.String())
 
 	cmd.Stderr = os.Stderr
 	cmdReader, err := cmd.StdoutPipe()
@@ -81,7 +84,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 
 	scanner := bufio.NewScanner(cmdReader)
 	for scanner.Scan() {
-		log.Println("youtube-dl ->", scanner.Text())
+		log.Println("cmd ->", scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
 		return err
@@ -108,9 +111,9 @@ func (d Downloader) Download(url, format string) (string, error) {
 		opts = append(opts, stringOption{"--format", format})
 	}
 
-	cmd := exec.Command("youtube-dl", url)
+	cmd := exec.Command(toolName, url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
-	log.Println("Running cmd", cmd.String())
+	log.Println("Running cmd:", cmd.String())
 
 	cmd.Stderr = os.Stderr
 	cmdReader, err := cmd.StdoutPipe()
@@ -150,7 +153,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 // pathPatterns contains patterns used to extract filenames from youtube-dl's output
 var pathPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`^\[download\][\s](.*?)[\s]has already.+$`),
-	regexp.MustCompile(`^\[ffmpeg\] Merging formats into "(.*?)"$`),
+	regexp.MustCompile(`^\[(?:ffmpeg|Merger)\] Merging formats into "(.*?)"$`),
 	regexp.MustCompile(`^\[download\] Destination:\W(.*?)$`),
 }
 
@@ -159,7 +162,7 @@ var pathPatterns = []*regexp.Regexp{
 // merges video+audio files).
 func capturingLogger(s bufio.Scanner, out chan<- string) {
 	for s.Scan() {
-		log.Println("youtube-dl ->", s.Text())
+		log.Println("cmd ->", s.Text())
 		if path, ok := matchLogPath(s.Text()); ok {
 			out <- path
 		}

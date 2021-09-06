@@ -45,5 +45,8 @@ func defaultOptions() ytdlopts {
 		boolOption{"--no-progress"},
 		boolOption{"--no-mtime"},
 		stringOption{"--match-filter", "!is_live"},
+		// Compatibility
+		stringOption{"--compat-options", "multistreams"},
+		stringOption{"--compat-options", "abort-on-error"},
 	}
 }

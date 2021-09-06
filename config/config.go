@@ -6,7 +6,7 @@ type Config struct {
 	// Directory for video downloads
 	DownloadsDir    string `env:"DOWNLOADS_DIR" envDefault:"./downloads"`
 	PlaylistSyncURL string `env:"PLAYLIST_SYNC"`
-	// youtube-dl format string
+	// yt-dlp format string
 	Format  string `env:"FORMAT"`
 	MaxSize int    `env:"MAX_SIZE" envDefault:"0"`
 }

@@ -23,6 +23,9 @@ func Test_matchLogPath(t *testing.T) {
 			"downloads/Dumbbell Romanian deadlift.f135.mp4", true},
 		{"download3", "[download] Destination: downloads/How to Protect Your Shopping Trolley From Improvised Explosives.webm",
 			"downloads/How to Protect Your Shopping Trolley From Improvised Explosives.webm", true},
+		// yt-dlp
+		{"merge2", "[Merger] Merging formats into \"downloads/How the Dutch Cross the Street (Safely) #shorts [DafhI7hc980].mp4\"",
+			"downloads/How the Dutch Cross the Street (Safely) #shorts [DafhI7hc980].mp4", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -39,13 +42,15 @@ func Test_matchLogPath(t *testing.T) {
 
 func TestNew(t *testing.T) {
 	downloader := New("path", "", nil)
-	want := Downloader{downloadsDir: "path", format: stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}}
+	want := Downloader{downloadsDir: "path",
+		format: stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}}
 	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
 	assert.Equal(t, downloader.format, want.format)
 	assert.NotNil(t, downloader.postFunc)
 
 	downloader = New("/downloads", "bestvideo", nil)
-	want = Downloader{downloadsDir: "/downloads", format: stringOption{"--format", "bestvideo"}}
+	want = Downloader{downloadsDir: "/downloads",
+		format: stringOption{"--format", "bestvideo"}}
 	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
 	assert.Equal(t, downloader.format, want.format)
 	assert.NotNil(t, downloader.postFunc)
