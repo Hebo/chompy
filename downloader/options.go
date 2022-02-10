@@ -44,7 +44,10 @@ func defaultOptions() ytdlopts {
 		stringOption{"--retries", "3"},
 		boolOption{"--no-progress"},
 		boolOption{"--no-mtime"},
-		stringOption{"--match-filter", "!is_live"},
+		boolOption{"--no-playlist"},
+		boolOption{"--embed-subs"},
+		stringOption{"--match-filter", "!is_live & !was_live"},
+		stringOption{"--sponsorblock-remove", "sponsor"},
 		// Compatibility
 		stringOption{"--compat-options", "multistreams"},
 		stringOption{"--compat-options", "abort-on-error"},

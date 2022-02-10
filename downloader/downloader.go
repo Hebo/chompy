@@ -43,7 +43,7 @@ func New(path, format string, postFunc func()) Downloader {
 }
 
 const (
-	toolName = "yt-dtp"
+	toolName = "yt-dlp"
 
 	ytdlArchiveFile = ".ytdl-archive.txt"
 	ytdlCookiesFile = ".ytdl-cookies.txt"
