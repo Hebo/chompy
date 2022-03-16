@@ -67,6 +67,15 @@ ex.
 
 Note that we can't predict the size of a downloaded video, so the disk usage may exceed your specified limit temporarily until cleanup is performed.
 
+### Authentication with .netrc
+
+Chompy can authenticate to sites by placing credentials in the `NETRC_CONTENTS` env variable, written in the [.netrc format](https://github.com/yt-dlp/yt-dlp#authentication-with-netrc-file) and base64-encoded:
+```
+echo "machine watchnebula login myaccount@gmail.com password my_password" | base64
+# bWFjaGluZSBuZWJ1bGEgbG9na...
+```
+
+
 ## Development
 
 ### Run locally

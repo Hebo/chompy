@@ -41,7 +41,7 @@ func (s Server) taskCleanup() {
 
 	for {
 		if _, ok := <-s.cleanup; ok {
-			log.Println("taskMaxSize task triggered")
+			log.Println("[taskCleanup] task triggered")
 
 			if s.maxSize == 0 {
 				continue
@@ -70,10 +70,10 @@ func (s Server) taskCleanup() {
 			}
 
 			log.Printf("Over max size by %d MiB. "+
-				"Deleting %d videos to free %d MiB", diff, len(vidsToDelete), reclaimed)
+				"[taskCleanup] Deleting %d videos to free %d MiB", diff, len(vidsToDelete), reclaimed)
 
 			if err = deleteVideoFiles(s.fs, vidsToDelete, s.downloadsDir); err != nil {
-				log.Println("Failed to delete videos:", err)
+				log.Println("[taskCleanup] Failed to delete videos:", err)
 			}
 		}
 	}

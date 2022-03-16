@@ -16,6 +16,8 @@ FROM alpine:3.12.1
 
 RUN set -x \
    && apk add --no-cache \
+         # base64
+         coreutils \
          tzdata \
          curl \
          ffmpeg \
@@ -39,4 +41,5 @@ VOLUME [ "/downloads" ]
 ENV DOWNLOADS_DIR="/downloads"
 ENV PORT=8000
 EXPOSE 8000
-ENTRYPOINT ["/app/chompy"]
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["/app/chompy"]
