@@ -3,9 +3,12 @@ package server
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/spf13/afero"
 )
@@ -76,5 +79,21 @@ func deleteVideoFiles(fs afero.Fs, videos []videoFile, dir string) error {
 			log.Printf("Error deleting file %q: %s\n", v.Filename, err)
 		}
 	}
+	return nil
+}
+
+func touch(dir, filename string) error {
+	videoPath := filepath.Join(dir, filepath.Clean(filename))
+
+	_, err := os.Stat(videoPath)
+	if err != nil {
+		return err
+	}
+	currentTime := time.Now().Local()
+	err = os.Chtimes(videoPath, currentTime, currentTime)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

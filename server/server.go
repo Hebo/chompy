@@ -3,8 +3,10 @@ package server
 import (
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strconv"
 	"time"
@@ -67,6 +69,7 @@ func New(cfg config.Config, fs afero.Fs) Server {
 	e.GET("/", srv.index)
 	e.GET(videosIndexPath+"/", srv.videosList)
 	e.POST("/download", srv.downloadVideo)
+	e.POST("/touch", srv.touch)
 
 	fSrv := http.FileServer(http.Dir(srv.downloadsDir))
 	e.GET(videosIndexPath+"/*", echo.WrapHandler(http.StripPrefix(videosIndexPath, fSrv)))
@@ -147,4 +150,18 @@ func (s *Server) downloadVideo(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
+}
+
+func (s *Server) touch(c echo.Context) error {
+	filename := c.FormValue("filename")
+	log.Printf("filename: %v", filename)
+
+	err := touch(s.downloadsDir, filename)
+	if os.IsNotExist(err) {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid filename")
+	} else if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusFound, "/")
 }

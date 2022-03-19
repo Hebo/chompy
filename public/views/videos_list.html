@@ -11,12 +11,25 @@
     body {
       min-width: 70%;
     }
+
     li {
       display: flex;
       justify-content: space-between;
     }
+
     .created {
       flex-shrink: 0;
+    }
+
+
+    button.link {
+      background: none;
+      border: none;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+      color: inherit;
+      font-size: 1em;
     }
   </style>
 </head>
@@ -33,9 +46,13 @@
       <span>
         <a href="{{escape .Filename}}">{{.Filename}}</a>
       </span>
-      <span class="created" title="{{.Created.Format "Mon, 02 Jan 2006 15:04:05 MST"}}">
-        {{humanTime .Created}}
+      <span class="created" title='{{.Created.Format "Mon, 02 Jan 2006 15:04:05 MST"}}'>
+        <form action="/touch" method="post">
+          <button class="link" name="filename" value="{{escape .Filename}}">{{humanTime .Created}}</button>
+        </form>
       </span>
+
+
     </li>
     {{end}}
   </ul>
