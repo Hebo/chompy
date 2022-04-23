@@ -46,6 +46,7 @@ func defaultOptions() ytdlopts {
 		boolOption{"--no-mtime"},
 		boolOption{"--no-playlist"},
 		boolOption{"--embed-subs"},
+		stringOption{"--sub-langs", "all,-live_chat"},
 		boolOption{"--netrc"},
 		stringOption{"--match-filter", "!is_live & !was_live"},
 		stringOption{"--sponsorblock-remove", "sponsor"},
