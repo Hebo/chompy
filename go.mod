@@ -14,10 +14,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/afero v1.5.1
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
-	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
-	golang.org/x/text v0.3.4 // indirect
-	golang.org/x/tools v0.1.3 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	honnef.co/go/tools v0.2.0
 )
