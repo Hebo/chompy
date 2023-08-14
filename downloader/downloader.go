@@ -57,6 +57,7 @@ func (d Downloader) DownloadPlaylist(url string) error {
 	opts := defaultOptions()
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	opts = append(opts, d.format)
+	opts = append(opts, defaultFormatSort)
 	opts = append(opts, stringOption{"--download-archive", path.Join(d.downloadsDir, ytdlArchiveFile)})
 	opts = append(opts, boolOption{"--mark-watched"})
 
@@ -106,6 +107,7 @@ func (d Downloader) Download(url, format string) (string, error) {
 	opts = append(opts, stringOption{"--output", path.Join(d.downloadsDir, ytdlOutputTemplate)})
 	if format == "" {
 		opts = append(opts, d.format)
+		opts = append(opts, defaultFormatSort)
 	} else {
 		log.Println("Using user-specified format: ", format)
 		opts = append(opts, stringOption{"--format", format})

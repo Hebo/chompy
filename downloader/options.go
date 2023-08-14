@@ -2,11 +2,11 @@ package downloader
 
 import "fmt"
 
-// defaultFormat = "bestvideo[height<=?1080]+bestaudio/best"
-// Goals: <=1080p, reasonable size, avoid merging if possible
+// Goals: <=1080p, reasonable size, iOS compatible, avoid merging if possible
 // Below works decently well, but merges a lot?
 // https://www.reddit.com/r/youtubedl/comments/fe08jx/can_youtubedl_download_only_mp4_files_at_1080_or/
-var defaultFormat = stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}
+var defaultFormat = stringOption{"--format", "bestvideo[height<=?1080]+bestaudio/best"}
+var defaultFormatSort = stringOption{"--format-sort", "vcodec:h264,res,acodec:m4a"}
 
 type ytdlopts []option
 
