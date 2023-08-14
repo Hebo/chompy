@@ -24,7 +24,7 @@ RUN set -x \
          python3 \
    # Install yt-dlp
    # https://github.com/yt-dlp/yt-dlp
-   && curl -sSLo /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+   && curl -sSLo /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp \
    && chmod a+rx /usr/local/bin/yt-dlp \
    # Requires python -> python3.
    && ln -s /usr/bin/python3 /usr/bin/python \
