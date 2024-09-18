@@ -43,7 +43,7 @@ func Test_matchLogPath(t *testing.T) {
 func TestNew(t *testing.T) {
 	downloader := New("path", "", nil)
 	want := Downloader{downloadsDir: "path",
-		format: stringOption{"--format", "bestvideo[ext=mp4][height<=?1080]+bestaudio[ext=m4a]/best"}}
+		format: stringOption{"--format", "bestvideo[height<=?1080]+bestaudio/best"}}
 	assert.Equal(t, downloader.downloadsDir, want.downloadsDir)
 	assert.Equal(t, downloader.format, want.format)
 	assert.NotNil(t, downloader.postFunc)
