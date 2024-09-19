@@ -21,7 +21,6 @@ jobs:
       - name: Test
         run: go test -v ./...
 
-      - name: Staticcheck
-        run: |
-          go get -u honnef.co/go/tools/cmd/staticcheck
-          staticcheck ./...
+      - uses: dominikh/staticcheck-action@v1
+        with:
+          version: "latest"
