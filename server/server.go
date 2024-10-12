@@ -68,6 +68,7 @@ func New(cfg config.Config, fs afero.Fs) Server {
 
 	e.GET("/", srv.index)
 	e.GET(videosIndexPath+"/", srv.videosList)
+	e.GET("/download", srv.downloadVideo)
 	e.POST("/download", srv.downloadVideo)
 	e.POST("/touch", srv.touch)
 
