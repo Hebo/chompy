@@ -12,7 +12,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/chompy
 
-FROM alpine:3.12.1
+FROM alpine:3.21.0
 
 RUN set -x \
    && apk add --no-cache \
