@@ -1,7 +1,6 @@
 package server
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -26,7 +25,7 @@ const versionPath = "/app/YTDLP_VERSION"
 func getVideoFiles(path string, order ordering) ([]videoFile, error) {
 	var vids []videoFile
 
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return vids, err
 	}
@@ -35,10 +34,17 @@ func getVideoFiles(path string, order ordering) ([]videoFile, error) {
 		if strings.HasPrefix(file.Name(), ".") || file.IsDir() {
 			continue
 		}
+
+		info, err := file.Info()
+		if err != nil {
+			log.Printf("error reading video file info: %v", err)
+			continue
+		}
+
 		vids = append(vids, videoFile{
 			Filename: file.Name(),
-			Created:  file.ModTime(),
-			Size:     file.Size() / toMiB,
+			Created:  info.ModTime(),
+			Size:     info.Size() / toMiB,
 		})
 	}
 
