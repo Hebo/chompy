@@ -1,5 +1,4 @@
 # Chompy
-
 ![Build](https://github.com/hebo/chompy/workflows/gobuild/badge.svg)
 
 **Download and watch videos easily on iOS**
@@ -33,6 +32,20 @@ docker run -p 8000:8000 \
 ### Show all downloads
 
 You can see all the videos downloaded by visiting `/videos`
+
+### Bookmarklet
+
+To trigger downloads from a browser bookmarklet:
+
+```
+javascript: (function () {
+  fetch("<chompy url here>", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: window.location.href }),
+  });
+})();
+```
 
 ### Video Formats
 

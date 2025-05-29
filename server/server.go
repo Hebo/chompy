@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -28,6 +29,7 @@ type Server struct {
 	playlistSyncURL string
 	maxSize         int
 	cleanup         chan (struct{})
+	ytdlpVersion    string
 }
 
 const videosIndexPath = "/videos"
@@ -53,14 +55,28 @@ func New(cfg config.Config, fs afero.Fs) Server {
 		templates: template.Must(template.New("main").Funcs(funcMap).ParseGlob("public/views/*.html")),
 	}
 
+	v, err := getYtdlpVersion()
+	if err == nil {
+		srv.ytdlpVersion = v
+	} else {
+		srv.ytdlpVersion = "Unknown"
+	}
+
 	// Echo instance
 	e := echo.New()
 	e.Renderer = t
 
 	// Middleware
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "${time_rfc3339} method=${method}, uri=${uri}, status=${status}\n",
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus: true,
+		LogURI:    true,
+		LogMethod: true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			fmt.Printf("%v method=%v, uri=%v, status=%v\n", v.StartTime.Format(time.RFC3339), v.Method, v.URI, v.Status)
+			return nil
+		},
 	}))
+	e.Use(middleware.CORS())
 	e.Use(middleware.Recover())
 
 	// Routes
@@ -77,6 +93,11 @@ func New(cfg config.Config, fs afero.Fs) Server {
 	e.GET(videosIndexPath, func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, videosIndexPath+"/")
 	})
+
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		fmt.Printf("error: %v\n", err)
+		e.DefaultHTTPErrorHandler(err, c)
+	}
 
 	srv.router = e
 	return srv
@@ -110,13 +131,23 @@ type videoFile struct {
 	Size     int64
 }
 
+type videoPage struct {
+	Videos []videoFile
+	Info   struct {
+		YtdlpVersion string
+	}
+}
+
 func (s *Server) videosList(c echo.Context) error {
 	vids, err := getVideoFiles(s.downloadsDir, createdDesc)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.Render(http.StatusOK, "videos_list.html", vids)
+	page := videoPage{Videos: vids}
+	page.Info.YtdlpVersion = s.ytdlpVersion
+
+	return c.Render(http.StatusOK, "videos_list.html", page)
 }
 
 type downloadRequest struct {

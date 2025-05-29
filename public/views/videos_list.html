@@ -32,17 +32,48 @@
       color: inherit;
       font-size: 1em;
     }
+
+    .header-container {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .help-icon {
+      font-size: 14px;
+      color: #666;
+      cursor: help;
+      position: relative;
+    }
+
+    .help-icon:hover::after {
+      content: "yt-dlp version: {{.Info.YtdlpVersion}}";
+      position: absolute;
+      top: -30px;
+      right: 0;
+      background: #333;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 1000;
+    }
   </style>
 </head>
 
 <body>
-  <h2>Chompy Videos</h2>
+  <div class="header-container">
+    <h2>Chompy Videos</h2>
+    <span class="help-icon" title="yt-dlp version: {{.Info.YtdlpVersion}}">?</span>
+  </div>
   <hr />
 
-  {{if .}}
-  <p>{{len .}} videos found</p>
+  {{if .Videos}}
+  <p>{{len .Videos}} videos found</p>
   <ul>
-    {{range .}}
+    {{range .Videos}}
     <li>
       <span>
         <a href="{{escape .Filename}}">{{.Filename}}</a>

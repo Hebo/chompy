@@ -1,5 +1,5 @@
 # build stage
-FROM golang as build
+FROM golang AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/chompy
 
-FROM alpine:3.21.0
+FROM alpine:3.21.3 AS install
 
 RUN set -x \
    && apk add --no-cache \
@@ -29,7 +29,10 @@ RUN set -x \
    # Clean-up
    && apk del curl
 
+
 WORKDIR /app
+
+RUN /usr/local/bin/yt-dlp --version > /app/YTDLP_VERSION
 
 COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/

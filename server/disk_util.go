@@ -21,6 +21,7 @@ const (
 )
 
 const toMiB = 1024 * 1024
+const versionPath = "/app/YTDLP_VERSION"
 
 func getVideoFiles(path string, order ordering) ([]videoFile, error) {
 	var vids []videoFile
@@ -49,6 +50,15 @@ func getVideoFiles(path string, order ordering) ([]videoFile, error) {
 	}
 
 	return vids, nil
+}
+
+func getYtdlpVersion() (string, error) {
+	version, err := os.ReadFile(versionPath)
+	if err != nil {
+		log.Printf("error reading yt-dlp version: %v\n", err)
+		return "", err
+	}
+	return strings.Trim(string(version), "\n"), nil
 }
 
 // needsDeletion checks if the total size of videos is over the specified limit
