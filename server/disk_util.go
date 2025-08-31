@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -22,6 +23,8 @@ const (
 const toMiB = 1024 * 1024
 const versionPath = "/app/YTDLP_VERSION"
 
+var videoExtensions = []string{".mp4"}
+
 func getVideoFiles(path string, order ordering) ([]videoFile, error) {
 	var vids []videoFile
 
@@ -31,7 +34,7 @@ func getVideoFiles(path string, order ordering) ([]videoFile, error) {
 	}
 
 	for _, file := range files {
-		if strings.HasPrefix(file.Name(), ".") || file.IsDir() {
+		if file.IsDir() || !slices.Contains(videoExtensions, filepath.Ext(file.Name())) {
 			continue
 		}
 
