@@ -3,9 +3,9 @@ set -e
 
 # Create .netrc from env
 if [[ ! -z "${NETRC_CONTENTS}" ]]; then
-    echo "$NETRC_CONTENTS" | base64 -d -i > ~/.netrc
+    echo "$NETRC_CONTENTS" | base64 -d -i > /home/app/.netrc
 else
-    echo '' > ~/.netrc
+    echo '' > /home/app/.netrc
 fi
 
 exec "$@"

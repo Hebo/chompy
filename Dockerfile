@@ -30,7 +30,7 @@ RUN set -x \
    && apk del curl
 
 RUN addgroup -g 1000 app \
-    && adduser -u 1000 -G app -D app
+    && adduser -u 1000 -G app app
 USER app
 WORKDIR /app
 
