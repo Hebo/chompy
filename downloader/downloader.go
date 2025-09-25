@@ -113,6 +113,13 @@ func (d Downloader) Download(url, format string) (string, error) {
 		opts = append(opts, stringOption{"--format", format})
 	}
 
+	cookiesPath := path.Join(d.downloadsDir, ytdlCookiesFile)
+	if _, err := os.Stat(cookiesPath); err == nil {
+		opts = append(opts, stringOption{"--cookies", cookiesPath})
+	} else if !os.IsNotExist(err) {
+		return "", errors.Wrap(err, "failed to read cookie file")
+	}
+
 	cmd := exec.Command(toolName, url)
 	cmd.Args = append(cmd.Args, opts.ToCmdArgs()...)
 	log.Println("Running cmd:", cmd.String())
