@@ -29,14 +29,16 @@ RUN set -x \
    # Clean-up
    && apk del curl
 
-
+RUN addgroup -g 1000 app \
+    && adduser -u 1000 -G app -D app
+USER app
 WORKDIR /app
 
 RUN /usr/local/bin/yt-dlp --version > /app/YTDLP_VERSION
 
-COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /app/ /app/
+COPY --chown=app:app --from=build /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --chown=app:app --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --chown=app:app --from=build /app/ /app/
 
 VOLUME [ "/downloads" ]
 ENV DOWNLOADS_DIR="/downloads"
