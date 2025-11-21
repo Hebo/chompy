@@ -50,7 +50,7 @@ func defaultOptions() ytdlopts {
 		stringOption{"--sub-langs", "all,-live_chat"},
 		boolOption{"--netrc"},
 		stringOption{"--match-filter", "!is_live & !was_live"},
-		stringOption{"--sponsorblock-remove", "sponsor"},
+		// stringOption{"--sponsorblock-remove", "sponsor"},
 		// Compatibility
 		stringOption{"--compat-options", "multistreams"},
 		stringOption{"--compat-options", "abort-on-error"},
