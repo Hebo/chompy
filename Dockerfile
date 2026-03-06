@@ -25,7 +25,7 @@ RUN set -x \
             ca-certificates \
       # Install yt-dlp
       # https://github.com/yt-dlp/yt-dlp
-      && curl -sSLo /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt-dlp \
+      && curl -sSLo /usr/local/bin/yt-dlp https://github.com/Hebo/yt-dlp/releases/download/master/yt-dlp \
       && chmod a+rx /usr/local/bin/yt-dlp \
       # Clean-up
       && apt-get remove -y curl \
