@@ -8,7 +8,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.24'
+          go-version: '1.24.x'
 
       - run: go version
 
@@ -24,3 +24,4 @@ jobs:
       - uses: dominikh/staticcheck-action@v1
         with:
           version: "latest"
+          install-go: false
